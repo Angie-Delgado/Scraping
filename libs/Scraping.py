@@ -13,7 +13,7 @@ class Scraping:
             encoded_url = urllib.parse.quote(url)
             api_url = settings.CODE_APISCRAPE.format(settings.TOKEN_APISCRAPE, encoded_url)
             response = requests.get(api_url)
-            response.raise_for_status()  # Lanza una excepción si hay un error HTTP
+            response.raise_for_status()  # Lanza una excepciï¿½n si hay un error HTTP
             return response.text
         except requests.exceptions.RequestException as e:
             raise requests.exceptions.RequestException(f"Error al cargar la pagina: {e}")
@@ -65,7 +65,7 @@ class Scraping:
             price_element = soup.find('span', {'class': 'a-price-fraction'})
             price += price_element.text.strip() if price_element else '00'
 
-            # Extraer la descripción del producto
+            # Extraer la descripciï¿½n del producto
             description_element = soup.find('div', {'id': 'feature-bullets'})
             description = description_element.text.strip() if description_element else ''
 
@@ -73,7 +73,7 @@ class Scraping:
             img_element = soup.find(id='landingImage')
             product_img = img_element.get('src') if img_element else ''
 
-            # Extraer las características del producto
+            # Extraer las caracterï¿½sticas del producto
             features = {}
             overview_elements = soup.find('div', {'data-feature-name': 'productOverview'})
             if not overview_elements:
@@ -101,7 +101,7 @@ class Scraping:
                 'product_img': product_img,
                 'features': features,
                 'link': url
-            }            
+            }
             
             return datos
         except ValueError as e:
