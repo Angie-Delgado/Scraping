@@ -6,8 +6,9 @@
     "\\scraper",
     "\\scraperApp",
     "\\scraperApp\\models",
+    "\\scraperApp\\models\\__pycache__",
     "\\scraperApp\\views"
   ],
-  "SelectedNode": "\\libs\\Scraping.py",
+  "SelectedNode": "\\scraperApp\\models\\__pycache__\\__init__.cpython-310.pyc",
   "PreviewInSolutionExplorer": false
 }

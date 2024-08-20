@@ -1,2 +1,3 @@
-from .ProductosView import *
 from .StartScraping import *
+from .ShowProducts import *
+from .StructureProducts import *

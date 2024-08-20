@@ -1,4 +1,5 @@
 import json
+from pickle import NONE
 from django.conf import settings
 from bs4 import BeautifulSoup
 from decimal import Decimal
@@ -7,7 +8,10 @@ import requests
 import os
 
 class Scraping:
+    def __init__(self,nid=None):
+        self.id = nid if nid else 0
 
+    @staticmethod
     def extract_dom(url):
         try:
             encoded_url = urllib.parse.quote(url)
@@ -20,6 +24,7 @@ class Scraping:
         except Exception as e:
             raise Exception(f"Error al extraer el DOM: {e}")
 
+    @staticmethod
     def export_to_json(data, file_name):
         try:
             if os.path.exists(file_name):
@@ -43,12 +48,11 @@ class Scraping:
                 json.dump(existing_data, currfile, ensure_ascii=False, indent=4)
                 
         except Exception as e:
-            print('error')
             raise Exception(f"Ocurrio un error escribiendo en el archivo: {e}")
     
-    def scrape_website(url):
+    def scrape_website(self, url):
         try:
-            html = Scraping.extract_dom(url)
+            html = self.extract_dom(url)
             soup = BeautifulSoup(html, 'html.parser')
             
             # Extraer el nombre del producto
@@ -73,7 +77,7 @@ class Scraping:
             img_element = soup.find(id='landingImage')
             product_img = img_element.get('src') if img_element else ''
 
-            # Extraer las caracter�sticas del producto
+            # Extraer las caracteristicas del producto
             features = {}
             overview_elements = soup.find('div', {'data-feature-name': 'productOverview'})
             if not overview_elements:
@@ -94,13 +98,30 @@ class Scraping:
                         value = value_element.find('span').text.strip()
                         features[key] = value
 
+            # Extraer las caracteristicas adicionales del producto
+            modules = {}
+            tablemodule_elements = soup.find('div', {'class': 'apm-tablemodule'})
+
+            if tablemodule_elements: 
+                features_elements = tablemodule_elements.find_all('tr',{'class:','apm-tablemodule-keyvalue'})
+                for feature in features_elements:
+                    key_element = feature.find('th', {'class': 'apm-tablemodule-keyhead'})
+                    value_element = feature.find('td', {'class': 'apm-tablemodule-valuecell'})                    
+
+                    if (key_element and value_element):
+                        key = key_element.find('span').text.strip()
+                        value = value_element.find('span').text.strip()
+                        modules[key] = value
+                        
             datos = {
-                'name': name,
-                'price': price,
-                'description': description,
-                'product_img': product_img,
-                'features': features,
-                'link': url
+                'id':           self.id,
+                'name':         name,
+                'price':        price,
+                'description':  description,
+                'product_img':  product_img,
+                'features':     features,
+                'modules':       modules,
+                'link':         url
             }
             
             return datos
@@ -109,24 +130,24 @@ class Scraping:
         except Exception as e:
             raise Exception(f"Ocurrio un error extrayendo el html: {e}")
 
-    def process_urls(name_files):
+    def process_urls(self,name_files):
         try:
             print("processing urls file")
             
-            urls = Scraping.read_urls_from_file(os.path.join(settings.BASE_DIR, settings.FILES_URL,name_files))
-            linea = 0;
+            urls = self.read_urls_from_file(os.path.join(settings.BASE_DIR, settings.FILES_URL,name_files))
         
             for url in urls:
                 if not url.startswith("Error"):
-                    linea += 1
-                    print(f"url linea {linea}")
-                    data = Scraping.scrape_website(url)
-                    Scraping.export_to_json(data, os.path.join(settings.BASE_DIR, settings.FILES_URL,'products.json'))
-        
+                    self.id +=1
+                    print(f"url linea {self.id}")
+                    data = self.scrape_website(url)
+                    self.export_to_json(data, os.path.join(settings.BASE_DIR, settings.FILES_URL,'products.json'))
             
+            return self.id
         except Exception as e:
             raise Exception(f"Ocurrio un error procesando las urls: {e}")
 
+    @staticmethod
     def read_urls_from_file(file_name):
         try:
             print('reading file in: '+file_name)
