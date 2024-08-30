@@ -1,8 +1,6 @@
-import json
-from pickle import NONE
 from django.conf import settings
 from bs4 import BeautifulSoup
-from decimal import Decimal
+from libs.Utils import Utils
 import urllib.parse
 import requests
 import os
@@ -23,33 +21,7 @@ class Scraping:
             raise requests.exceptions.RequestException(f"Error al cargar la pagina: {e}")
         except Exception as e:
             raise Exception(f"Error al extraer el DOM: {e}")
-
-    @staticmethod
-    def export_to_json(data, file_name):
-        try:
-            if os.path.exists(file_name):
-                with open(file_name, 'r', encoding='utf-8') as currfile:
-                    try:
-                        existing_data = json.load(currfile)
-                    except json.JSONDecodeError:
-                        existing_data = []
-            else:
-                existing_data = []
-
-            # Asegurarse de que existing_data es una lista
-            if not isinstance(existing_data, list):
-                raise ValueError("El archivo JSON no contiene una lista. El formato del archivo no es compatible.")
-
-            # Agregar los nuevos datos a la lista existente
-            existing_data.append(data)
-
-            # Escribir el contenido actualizado en el archivo
-            with open(file_name, 'w', encoding='utf-8') as currfile:
-                json.dump(existing_data, currfile, ensure_ascii=False, indent=4)
-                
-        except Exception as e:
-            raise Exception(f"Ocurrio un error escribiendo en el archivo: {e}")
-    
+        
     def scrape_website(self, url):
         try:
             html = self.extract_dom(url)
@@ -72,6 +44,7 @@ class Scraping:
             # Extraer la descripci�n del producto
             description_element = soup.find('div', {'id': 'feature-bullets'})
             description = description_element.text.strip() if description_element else ''
+            description = description.replace('\n','')
 
             # Extraer la imagen del producto
             img_element = soup.find(id='landingImage')
@@ -96,22 +69,23 @@ class Scraping:
                     if (key_element and value_element):
                         key = key_element.find('span').text.strip()
                         value = value_element.find('span').text.strip()
-                        features[key] = value
+                        features[key] = value.replace('\n','')
 
             # Extraer las caracteristicas adicionales del producto
-            modules = {}
-            tablemodule_elements = soup.find('div', {'class': 'apm-tablemodule'})
-
-            if tablemodule_elements: 
-                features_elements = tablemodule_elements.find_all('tr',{'class:','apm-tablemodule-keyvalue'})
-                for feature in features_elements:
-                    key_element = feature.find('th', {'class': 'apm-tablemodule-keyhead'})
-                    value_element = feature.find('td', {'class': 'apm-tablemodule-valuecell'})                    
+            detail = {}
+          
+            detail_elements = soup.find_all('table', {'class': 'prodDetTable'})
+            
+            for tabla in detail_elements:
+                rows = tabla.find_all('tr')
+                for row in rows:
+                    key_element = row.find('th')
+                    value_element = row.find('td')                    
 
                     if (key_element and value_element):
-                        key = key_element.find('span').text.strip()
-                        value = value_element.find('span').text.strip()
-                        modules[key] = value
+                        key = key_element.text.strip()
+                        value = value_element.text.strip()
+                        detail[key] = value.replace('\n','')
                         
             datos = {
                 'id':           self.id,
@@ -120,7 +94,7 @@ class Scraping:
                 'description':  description,
                 'product_img':  product_img,
                 'features':     features,
-                'modules':       modules,
+                'detail':       detail,
                 'link':         url
             }
             
@@ -133,29 +107,20 @@ class Scraping:
     def process_urls(self,name_files):
         try:
             print("processing urls file")
-            
-            urls = self.read_urls_from_file(os.path.join(settings.BASE_DIR, settings.FILES_URL,name_files))
-        
+            print('reading file in: '+os.path.join(settings.BASE_DIR, settings.FILES_URL,name_files))
+
+            urls = Utils.get_list_from_txt(os.path.join(settings.BASE_DIR, settings.FILES_URL,name_files))
+            alldata = []
             for url in urls:
                 if not url.startswith("Error"):
                     self.id +=1
                     print(f"url linea {self.id}")
                     data = self.scrape_website(url)
-                    self.export_to_json(data, os.path.join(settings.BASE_DIR, settings.FILES_URL,'products.json'))
+                    alldata.append(data)
+                    #Utils.push_json_file(data, os.path.join(settings.BASE_DIR, settings.FILES_URL,'products.json'))
             
-            return self.id
+            return self.id, alldata
         except Exception as e:
             raise Exception(f"Ocurrio un error procesando las urls: {e}")
-
-    @staticmethod
-    def read_urls_from_file(file_name):
-        try:
-            print('reading file in: '+file_name)
-
-            with open(file_name, 'r', encoding='utf-8') as currfile:
-                urls = [line.strip() for line in currfile if line.strip()]
-            return urls
-        except Exception as e:
-                raise Exception(f'Ocurrio un error leyendo el archivo txt: {e}')
 
         

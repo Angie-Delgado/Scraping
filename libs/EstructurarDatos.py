@@ -163,21 +163,3 @@ class EstructurarDatosEn:
         except Exception as e:
             raise Exception(f"Error en extraer_dato: {e}")
 
-descripcion = """
-descripcion = Sobre este artículo    Procesador y sistema: el procesador Intel Quad-Core Pentium N200, 2.7 GHz-4 núcleos-4 hilos, Windows 11 Home.    Pantalla: pantalla de 15.6 pulgadas (1366 x 768) con biseles estrechos y diseño antirreflejos que ofrece una experiencia visual vívida y clara. La batería soporta hasta 11 horas y 45 minutos de reproducción de video.    Teclado: teclado suave de tamaño completo con teclado numérico y teclas de función como obturador de cámara, tecla de silencio de micrófono y tecla de modo avión.    Almacenamiento y puertos: 16 GB de RAM, 128 GB UFS y 128 GB de almacenamiento externo SSD. Alta velocidad y fiabilidad. Múltiples puertos: USB Type-C, USB Type-A, HDMI, Wi-Fi 6 y Bluetooth 5.    【Dimensiones y peso】Mide 20.47 x 12.01 x 2.72 pulgadas y pesa solo 3.24 libras, su diseño elegante garantiza una portabilidad de moda sobre la marcha.    \n›  Ver los detalles del producto
-"""
-
-datos = {}
-from_description = EstructurarDatosEs(descripcion)
-
-for clave, valor in from_description.caracteristicas.items():
-    datos[clave] = valor  
-print(datos)
-
-texto= "About this item    MULTITASKING MASTER - The IdeaPad 1 is a thin and compact laptop that offers responsive performance and anticipates your every need for effortless on-the-go multitasking    MORE EXPANSIVE DISPLAY - Indulge in a better binging experience by immersing yourself in your favorite shows with a borderless display for more screen while listening to clear, rich audio from two Dolby Audio speakers    PERFORMANCE ON THE GO - Zip along while multitasking across several tabs, the new AMD Ryzen 5 5500U processor built on UMA architecture delivers punchy mobile performance with a 20W thermal design point    LIGHTEST PART OF YOUR DAY - Weighing just 3.5 lbs, the effortlessly cool cloud grey laptop is lighter than your water bottle and just as essential    SOLID SECURITY - Keep your home life private and be seen only when you want to be with the 720p camera that comes with a physical privacy shutter    PRODUCTIVITY WITH NO LIMITS - No Wi-Fi? No worries, with 512GB storage, 12 hours of battery life, and rapid charge you can access and edit your files offline, anywhere and still have space for all your family's needs    A SMARTER WAY TO LEARN - Flip to Start turns on your IdeaPad 1 immediately upon opening the lid, so you can hop on that urgent video call and let your ideas be heard thanks to Smart Noise Cancelling minimizing background noise    \n   EQUIPPED FOR WORK AND PLAY - Ready to connect to your world with 2 USB ports, USB-C port, HDMI port, SD card reader, and a combination headphone/mic jack SIZE UNPACKED (D x H x W) - 360 x 236 x 17.9 mm or 14.17 x 9.29 x 0.70 inches INCLUDED ITEMS - Computer, Charger, User Guide   Show more"
-datos2 = {}
-from_description_en = EstructurarDatosEn(texto)
-
-for clave, valor in from_description_en.caracteristicas.items():
-    datos2[clave] = valor
-print(datos2)
