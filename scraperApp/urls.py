@@ -19,6 +19,7 @@ from .views import StartScraping, ShowProducts, StructureProducts
 
 urlpatterns = [
     #mapeo,origen,referencia
+    path('', StartScraping.as_view(), name='start_scraping'),
     path('start-scraping/', StartScraping.as_view(), name='start_scraping'),
     path('productos/', ShowProducts.as_view(), name='productos_lista'),
     path('estructurar/', StructureProducts.as_view(), name='estructurar'),
