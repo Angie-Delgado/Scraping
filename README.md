@@ -51,7 +51,11 @@ Ejecuta el siguiente comando para instalar las dependencias necesarias:
 ## Funcionamiento
 
 ### Carga de URLs:
-La aplicación lee el archivo `urls.txt` y carga todas las URLs que se deben procesar.
+La aplicación lee el archivo `urls.txt` y carga todas las URLs que se deben procesar. 
+
+Una vez finalizado el proceso en tu navegador se debe imprimir el siguiente mensaje:
+
+![alt text](image.png)
 
 ### Registro de URLs cargadas:
 La aplicación actualiza el listado de las URLs procesadas en el archivo `urlsagregadas.txt`. Este archivo no se debe editar.
